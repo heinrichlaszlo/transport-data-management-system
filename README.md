@@ -1,6 +1,6 @@
 # transport-data-management-system
 
-You must first run management-logistic-system and then transport-data-management-system.
+You must first run https://github.com/heinrichlaszlo/management-logistic-system and then https://github.com/heinrichlaszlo/transport-data-management-system.
 
 The id-s are the selected user id.
 
