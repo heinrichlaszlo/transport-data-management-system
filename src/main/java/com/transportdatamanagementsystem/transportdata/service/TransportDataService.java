@@ -5,17 +5,24 @@ import com.transportdatamanagementsystem.exception.InvalidUserPermissionExceptio
 import com.transportdatamanagementsystem.permission.UserPermission;
 import com.transportdatamanagementsystem.transportdata.model.TransportData;
 import com.transportdatamanagementsystem.transportdata.repository.TransportDataRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 @Service
 @Transactional
+@Slf4j
 public class TransportDataService {
 
-    private final String userPermissionUrl = "http://localhost:4040/users/getUserPermission/id";
+    private final String userPermissionUrl = "http://localhost:4040/users/login/{name}/{password}";
+
+    private List<String> permissions = new ArrayList<>();
 
     private final TransportDataRepository transportDataRepository;
 
@@ -27,41 +34,53 @@ public class TransportDataService {
         this.apiConnector = apiConnector;
     }
 
-    public List<TransportData> findAllTransportDatas(Long userId) {
-        var permission = getPermission(userId);
-        if(!permission.contains(UserPermission.READ_ONLY.name())){
+    public List<TransportData> findAllTransportDatas() {
+        if(!permissions.contains(UserPermission.READ_ONLY.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : "+ UserPermission.READ_ONLY.name());
         }
         return transportDataRepository.findAll();
     }
 
-    public TransportData addTransportData(TransportData transportData, Long userId) {
-        var permission = getPermission(userId);
-        if(!permission.contains(UserPermission.ADD.name())){
+    public TransportData addTransportData(TransportData transportData) {
+        if(!permissions.contains(UserPermission.ADD.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : " +UserPermission.ADD.name());
         }
         return transportDataRepository.save(transportData);
     }
 
-    public TransportData updateTransportData(TransportData transportData, Long userId) {
-        var permission = getPermission(userId);
-        if(!permission.contains(UserPermission.MODIFY.name())){
+    public TransportData updateTransportData(TransportData transportData) {
+        if(!permissions.contains(UserPermission.MODIFY.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : " + UserPermission.MODIFY.name());
         }
         return transportDataRepository.save(transportData);
 
     }
 
-    public void deleteTransportData(Long id, Long userId){
-        var permission = getPermission(userId);
-        if(!permission.contains(UserPermission.DELETE.name())){
+    public void deleteTransportData(Long id){
+        if(!permissions.contains(UserPermission.DELETE.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : "+UserPermission.DELETE.name());
         }
         transportDataRepository.deleteTransportDataById(id);
     }
 
-    private String getPermission(Long userId){
-        var url = userPermissionUrl.replace("id", String.valueOf(userId));
-        return apiConnector.getJSONArray(url);
+    public JSONObject login(String name, String password){
+       var urlWithName =  userPermissionUrl.replace("{name}", String.valueOf(name));
+        var url = urlWithName.replace("{password}", String.valueOf(password));
+        var response = apiConnector.getPermissions(url);
+        getPermissions(response);
+        return response;
+    }
+
+    public void logout(){
+        permissions.clear();
+        log.info("successful logout");
+    }
+
+    private void getPermissions(JSONObject response){
+        var permissionArray = (JSONArray) response.get("permissions");
+        log.info(permissionArray.toString());
+        for (Object permission : permissionArray) {
+            permissions.add(permission.toString());
+        }
     }
 }

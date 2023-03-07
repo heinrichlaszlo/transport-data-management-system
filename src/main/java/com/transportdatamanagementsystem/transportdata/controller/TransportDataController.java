@@ -19,29 +19,37 @@ public class TransportDataController {
     }
 
 
-    @GetMapping("/all/{id}")
-    public ResponseEntity<List<TransportData>> FindAllTransportDatas(@PathVariable("id") Long id){
-        var transportDatas = transportDataService.findAllTransportDatas(id);
-        return new ResponseEntity<>(transportDatas, HttpStatus.OK);
+    @GetMapping("/all")
+    public ResponseEntity<List<TransportData>> FindAllTransportDatas(){
+           var transportDatas = transportDataService.findAllTransportDatas();
+           return new ResponseEntity<>(transportDatas, HttpStatus.OK);
     }
 
-    @PostMapping("/add/{id}")
-    public ResponseEntity<TransportData> addTransportData(@RequestBody TransportData transportData,@PathVariable("id") Long id){
-        var newTransportData = transportDataService.addTransportData(transportData, id);
+    @PostMapping("/add")
+    public ResponseEntity<TransportData> addTransportData(@RequestBody TransportData transportData){
+        var newTransportData = transportDataService.addTransportData(transportData);
         return new ResponseEntity<>(newTransportData, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<TransportData> updateTransportData(@RequestBody TransportData transportData, @PathVariable("id") Long id){
-        var updateTransportData = transportDataService.updateTransportData(transportData, id);
+    @PutMapping("/update")
+    public ResponseEntity<TransportData> updateTransportData(@RequestBody TransportData transportData){
+        var updateTransportData = transportDataService.updateTransportData(transportData);
         return new ResponseEntity<>(updateTransportData, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{userId}/{transportDataId}")
-    public ResponseEntity<?> deleteTransportData( @PathVariable("userId") Long userId,@PathVariable("transportDataId") Long transportDataId){
-        transportDataService.deleteTransportData(transportDataId, userId);
+    @DeleteMapping("/delete/{transportDataId}")
+    public ResponseEntity<?> deleteTransportData(@PathVariable("transportDataId") Long transportDataId){
+        transportDataService.deleteTransportData(transportDataId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
+    @GetMapping("/login/{name}/{password}")
+    public ResponseEntity<?> login(@PathVariable("name") String name,@PathVariable("password") String password){
+        var response = transportDataService.login(name,password);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logout(){
+        transportDataService.logout();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -1,6 +1,8 @@
 package com.transportdatamanagementsystem.apiconnector;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Component;
 
 import java.net.HttpURLConnection;
@@ -10,9 +12,10 @@ import java.util.Scanner;
 @Component
 @Slf4j
 public class ApiConnector {
-    public String getJSONArray(String query) {
-
+    public JSONObject getPermissions(String query) {
+log.info(query);
         StringBuilder informationString = null;
+        JSONObject dataObject = null;
         try {
             URL url = new URL(query);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -33,12 +36,17 @@ public class ApiConnector {
                 }
 
                 scanner.close();
+
+                JSONParser parse = new JSONParser();
+                dataObject = (JSONObject) parse.parse(String.valueOf(informationString));
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log.info("permissions: " + informationString.toString());
-        return informationString.toString();
+
+        return dataObject;
     }
 
 }
