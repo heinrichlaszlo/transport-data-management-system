@@ -2,20 +2,26 @@
 
 You must first run https://github.com/heinrichlaszlo/management-logistic-system and then https://github.com/heinrichlaszlo/transport-data-management-system.
 
-The id-s are the selected user id.
+Firstly you have to login.
 
-You can see all transport data if the selected user has READ permission.
+http://localhost:8080/transportData/login/name/password
 
-http://localhost:8080/transportData/all/{id}
+You can see all transport data if the logged user the selected user has READ permission.
 
-You can add transport data if the selected user has ADD permission.
+http://localhost:8080/transportData/all
 
-http://localhost:8080/transportData/add/{id}
+You can add transport data if the logged userr has ADD permission.
 
-You can modify transport data if the selected user has MODIFY permission.
+http://localhost:8080/transportData/add
 
-http://localhost:8080/transportData/update/{id}
+You can modify transport data if the logged user has MODIFY permission.
 
-You can delete transport data if the selected user has DELETE permission.
+http://localhost:8080/transportData/update
 
-http://localhost:8080/transportData/delete/{userId}/{transportDataId}
+You can delete transport data if the logged user has DELETE permission.
+
+http://localhost:8080/transportData/delete/{transportDataId}
+
+and the logout:
+
+http://localhost:8080/transportData/logout
