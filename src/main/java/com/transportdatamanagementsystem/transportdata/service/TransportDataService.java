@@ -2,6 +2,7 @@ package com.transportdatamanagementsystem.transportdata.service;
 
 import com.transportdatamanagementsystem.apiconnector.ApiConnector;
 import com.transportdatamanagementsystem.exception.InvalidUserPermissionException;
+import com.transportdatamanagementsystem.exception.NoneUserPermissionException;
 import com.transportdatamanagementsystem.permission.UserPermission;
 import com.transportdatamanagementsystem.transportdata.model.TransportData;
 import com.transportdatamanagementsystem.transportdata.repository.TransportDataRepository;
@@ -35,13 +36,15 @@ public class TransportDataService {
     }
 
     public List<TransportData> findAllTransportDatas() {
-        if(!permissions.contains(UserPermission.READ_ONLY.name())){
+        guardNonePermission(permissions);
+        if(permissions.contains(UserPermission.NONE.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : "+ UserPermission.READ_ONLY.name());
         }
         return transportDataRepository.findAll();
     }
 
     public TransportData addTransportData(TransportData transportData) {
+        guardNonePermission(permissions);
         if(!permissions.contains(UserPermission.ADD.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : " +UserPermission.ADD.name());
         }
@@ -49,6 +52,7 @@ public class TransportDataService {
     }
 
     public TransportData updateTransportData(TransportData transportData) {
+        guardNonePermission(permissions);
         if(!permissions.contains(UserPermission.MODIFY.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : " + UserPermission.MODIFY.name());
         }
@@ -57,6 +61,7 @@ public class TransportDataService {
     }
 
     public void deleteTransportData(Long id){
+        guardNonePermission(permissions);
         if(!permissions.contains(UserPermission.DELETE.name())){
             throw new InvalidUserPermissionException("Invalid user permission! The necessary permission is : "+UserPermission.DELETE.name());
         }
@@ -81,6 +86,12 @@ public class TransportDataService {
         log.info(permissionArray.toString());
         for (Object permission : permissionArray) {
             permissions.add(permission.toString());
+        }
+    }
+
+    private void guardNonePermission(List<String> permissions){
+        if(permissions.contains(UserPermission.NONE.name())){
+          throw new NoneUserPermissionException("You have NONE permission.");
         }
     }
 }
